@@ -2,7 +2,7 @@ package lineprinter
 
 import (
 	"bytes"
-	"io"
+	"strings"
 	"unicode/utf8"
 
 	"golang.org/x/text/encoding/charmap"
@@ -75,6 +75,7 @@ func classifyLevel(r rune) int {
 			return LevelBase
 		}
 	}
+
 	return LevelBase
 }
 
@@ -88,6 +89,7 @@ func encodeRuneToTIS620Byte(r rune) []byte {
 	if err != nil || nDst == 0 {
 		return []byte{' '}
 	}
+
 	return dst[:nDst]
 }
 
@@ -98,9 +100,11 @@ func decodeWindows874ByteToRune(b byte) rune {
 	dst := make([]byte, 4)
 	nDst, _, err := decoder.Transform(dst, src, true)
 	if err != nil || nDst == 0 {
+
 		return ' '
 	}
 	r, _ := utf8.DecodeRune(dst[:nDst])
+
 	return r
 }
 
@@ -123,6 +127,7 @@ func applyCombinedCharacter(cells []cell) []cell {
 				newUpper := append([]byte{}, proprietaryByte...)
 				newUpper = append(newUpper, c.lvUpper[2:]...)
 				c.lvUpper = newUpper
+
 				continue
 			}
 
@@ -133,6 +138,7 @@ func applyCombinedCharacter(cells []cell) []cell {
 			}
 		}
 	}
+
 	return cells
 }
 
@@ -147,12 +153,14 @@ func decomposeSaraAm(text string) []rune {
 			runesToProcess = append(runesToProcess, r)
 		}
 	}
+
 	return runesToProcess
 }
 
 // Add a new base cell
 func addBaseCell(cells *[]cell, base []byte) int {
 	*cells = append(*cells, cell{lvBase: base})
+
 	return len(*cells) - 1
 }
 
@@ -221,24 +229,39 @@ func buildLines(cells []cell) ([]byte, []byte, []byte) {
 func splitThaiText(text string) ([]byte, []byte, []byte) {
 	cells := processTextToCells(text)
 	cells = applyCombinedCharacter(cells)
+
 	return buildLines(cells)
 }
 
 // Convert Thai text to 3-level Windows-874 byte format
-func FormatThaiText(text string) []byte {
+func levelingThaiText(text string) []byte {
 	lvUpper, lvBase, lvBottom := splitThaiText(text)
+
 	var output bytes.Buffer
+
 	output.Write(lvUpper)
 	output.WriteByte('\n')
 	output.Write(lvBase)
 	output.WriteByte('\n')
 	output.Write(lvBottom)
 	output.WriteByte('\n')
+
 	return output.Bytes()
 }
 
-// Print writes formatted Thai output directly
-func Print(buffer io.Writer, text string) error {
-	_, err := buffer.Write(FormatThaiText(text))
-	return err
+func ToLP3(content string) []byte {
+	lines := strings.Split(content, "\n")
+	var formatted [][]byte
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		if trimmed == "" {
+			formatted = append(formatted, []byte{'\n'})
+		} else {
+			formatted = append(formatted, levelingThaiText(line))
+		}
+	}
+
+	return bytes.Join(formatted, []byte{})
 }

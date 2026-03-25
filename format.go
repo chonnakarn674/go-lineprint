@@ -34,6 +34,7 @@ func countNonInlineThaiCharacters(str string) int {
 			count++
 		}
 	}
+
 	return count
 }
 
@@ -43,6 +44,7 @@ func padRight(str string, length int) string {
 	if runeLen >= length {
 		return str
 	}
+
 	return str + strings.Repeat(" ", length-runeLen)
 }
 
@@ -60,6 +62,7 @@ func createBuffer(length int) []rune {
 	for i := range runes {
 		runes[i] = ' '
 	}
+
 	return runes
 }
 
@@ -75,6 +78,7 @@ func insertIntoBuffer(runes []rune, pos int, arg string) []rune {
 			runes[pos+j] = r
 		}
 	}
+
 	return runes
 }
 
@@ -109,17 +113,20 @@ func Format(buffer io.Writer, positions []int, args ...string) error {
 // FormatLine writes separator
 func FormatLine(buffer io.Writer) error {
 	_, err := buffer.Write([]byte("-----------------------------------------------------------------------------------------------------\n"))
+
 	return err
 }
 
 // FormatNewLine writes N line feeds
 func FormatNewLine(buffer io.Writer, total int) error {
 	_, err := buffer.Write([]byte(strings.Repeat("\n", total)))
+
 	return err
 }
 
 // FormatNewPage writes form feed
 func FormatNewPage(buffer io.Writer) error {
 	_, err := buffer.Write([]byte{12})
+
 	return err
 }

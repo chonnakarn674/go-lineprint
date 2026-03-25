@@ -1,16 +1,16 @@
 # go-lineprinter
 
-A Go library for **line matrix printer reports**, supporting Thai text alignment and legacy printer encoding.
+A Go library for generating **line matrix printer reports**, with support for Thai text alignment and legacy printer encoding.
 
 ---
 
 ## Features
 
-* Fixed-position formatting (column layout)
-* Thai alignment correction
-* Windows-874 encoding support
-* 3-level Thai rendering (upper/base/bottom)
-* Buffer → Redis → Printer workflow
+- Fixed-position formatting (column-based layout)
+- Thai text alignment support
+- Windows-874 (TIS-620) encoding
+- 3-level Thai rendering (upper / base / bottom)
+- Buffer → Redis → Printer workflow support
 
 ---
 
@@ -45,12 +45,14 @@ lineprint.FormatNewPage(&buf)
 
 ---
 
-### 2. Render Thai text for line matrix printers 
+### 2. Convert Thai text into 3-level line printer format
 
 ```go
 var buf bytes.Buffer
 
-lineprint.Print(&buf, "กำลังทดสอบ")
+data := lineprint.ToLP3("กำลังทดสอบ")
+
+buf.Write(data)
 ```
 
 ---
@@ -83,10 +85,10 @@ printer.Write(data)
 Format(io.Writer, []int, ...string)
 ```
 
-### Print
+### ToLP3
 
 ```
-Print(io.Writer, string)
+ToLP3(string) []byte
 ```
 
 ---
