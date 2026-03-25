@@ -17,7 +17,7 @@ A Go library for **line matrix printer reports**, supporting Thai text alignment
 ## Installation
 
 ```bash
-go get github.com/chonnakarn674/go-lineprinter
+go get github.com/chonnakarn674/go-lineprint
 ```
 
 ---
